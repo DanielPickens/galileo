@@ -1,0 +1,30 @@
+version: '3.7'
+services: 
+
+  galileo-db-migrator:
+    container_name: galileo-db-migrator
+    extends:
+      file: ./ci/compose/galileo.yaml
+      service: galileo-service
+    env_file: ./ci/config/boilerplate/galileo.dev-env
+    command: ["service", "-e", "-d", "db", "migrate"]
+
+  galileo-db-seeder:
+    container_name: galileo-db-seeder
+    extends:
+      file: ./ci/compose/galileo.yaml
+      service: galileo-service
+    env_file: ./ci/config/boilerplate/galileo.dev-env
+    command: ["service", "-e", "-d", "db", "seed"]
+    depends_on:
+      galileo-db-migrator:
+        condition: service_completed_successfully
+
+  galileo-service:
+    extends:
+      file: ./ci/compose/galileo.yaml
+      service: galileo-service
+    env_file: ./ci/config/boilerplate/galileo.dev-env
+    depends_on:
+      galileo-db-seeder:
+        condition: service_completed_successfully

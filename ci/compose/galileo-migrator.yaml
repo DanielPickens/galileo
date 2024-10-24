@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  galileoe-db-creator:
+    container_name: galileoe-db-creator
+    build:
+      context: ../../
+      dockerfile: ./ci/docker/Dockerfile
+    env_file: ./docker.dev.env
+    command: ["service", "-e", "-d", "db", "create"]
+  galileoe-db-migrator:
+    container_name: galileoe-db-migrator
+    build:
+      context: ../../
+      dockerfile: ./ci/docker/Dockerfile
+    env_file: ./docker.dev.env
+    command: ["service", "-e", "-d", "db", "migrate"]
+    depends_on:
+      galileoe-db-creator:
+        condition: service_completed_successfully
